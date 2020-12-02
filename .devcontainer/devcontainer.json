@@ -1,0 +1,13 @@
+{
+    "name": "FridayDev",
+    "context": "..",
+    "dockerFile": "../Dockerfile",
+    "mounts": [],
+    "settings": {},
+    "extensions": [],
+    "runArgs": [
+        "--net=host",
+        "--shm-size=1g",
+        "--memory=4g",
+    ]
+}
