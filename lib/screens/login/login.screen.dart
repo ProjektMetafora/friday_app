@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:friday_app/constants/backend.url.dart';
 import 'package:friday_app/contrauikit/custom_widgets/button_solid_with_icon.dart';
 import 'package:friday_app/contrauikit/login/contra_text.dart';
 import 'package:friday_app/contrauikit/utils/colors.dart';
@@ -25,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           Container(
@@ -60,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 24,
                 ),
                 Expanded(
-                  flex: 4,
+                  flex: 7,
                   child: Column(
                     children: <Widget>[
                       ContraText(
@@ -100,16 +102,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               "${emailController.text}:${passwordController.text}"));
                           print('encoded: $encoded');
 
-                          String statusString = "";
+                          String statusString = "LOGIN SUCCESS";
+                          bool success = false;
 
                           try {
                             var r = await Requests.get(
-                              'http://192.168.1.193:8001/login/$encoded',
+                              '$baseUrl/login/$encoded',
                               bodyEncoding: RequestBodyEncoding.JSON,
                             );
                             r.raiseForStatus();
                             String body = r.content();
                             print(body);
+
+                            success = true;
 
                             // login success, go to KYC screen
                             Navigator.push(
@@ -118,16 +123,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                 builder: (context) => KycScreen(),
                               ),
                             );
-
                           } on HTTPException catch (err) {
                             statusString = err.message;
+                            statusString = err.response.json()['detail'];
                             print(err.message);
                           } catch (err) {
                             statusString = err.toString();
                             print(err);
                           }
 
-                          final snackBar = SnackBar(content: Text(statusString));
+                          final snackBar = SnackBar(
+                            content: Text(statusString),
+                            backgroundColor:
+                                success ? Colors.green : Colors.red,
+                          );
 
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         },

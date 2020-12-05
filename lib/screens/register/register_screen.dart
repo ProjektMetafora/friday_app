@@ -5,6 +5,7 @@ import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:friday_app/constants/backend.url.dart';
 import 'package:friday_app/contrauikit/custom_widgets/button_plain_with_shadow.dart';
 import 'package:friday_app/contrauikit/custom_widgets/button_round_with_shadow.dart';
 import 'package:friday_app/contrauikit/login/contra_text.dart';
@@ -75,7 +76,7 @@ class RegisterInputField extends StatelessWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  String countryCode;
+  String countryCode = "+91";
 
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -193,6 +194,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             text: "Phone Number",
                             iconPath: "assets/icons/mail.svg",
                             keyboardType: TextInputType.phone,
+                            controller: phoneNumberController,
                           ),
                         ),
                       ],
@@ -231,36 +233,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         String firstName = splitName[0].trim();
                         String lastName = splitName.sublist(1).join(" ").trim();
 
-                        String statusMessage = "UNKNOWN";
+                        String statusMessage = "REGISTER SUCCESS";
+
+                        bool success = false;
 
                         try {
+                          Map<String, dynamic> body = {
+                            "firstname": firstName,
+                            "lastname": lastName,
+                            "email": "${emailController.text}",
+                            "country_code": countryCode,
+                            "mob": phoneNumberController.text,
+                          };
+
+                          print(body);
+
                           var r = await Requests.post(
-                            'http://192.168.1.193:8001/register/$encoded',
-                            body: {
-                              "firstname": firstName,
-                              "lastname": lastName,
-                              "email": "${emailController.text}",
-                              "country_code": countryCode,
-                              "mob": phoneNumberController.text,
-                            },
+                            '$baseUrl/register/$encoded',
+                            body: body,
                             bodyEncoding: RequestBodyEncoding.JSON,
                           );
                           r.raiseForStatus();
-                          String body = r.content();
-                          print(body);
+                          String response = r.content();
+                          print(response);
+
+                          success = true;
 
                           // register success
                           Navigator.of(context).pop();
-
                         } on HTTPException catch (err) {
                           statusMessage = err.message;
+                          statusMessage = err.response.json()['detail'];
                           print(err.message);
                         } catch (err) {
                           statusMessage = err.toString();
                           print(err);
                         }
 
-                        final snackBar = SnackBar(content: Text(statusMessage));
+                        final snackBar = SnackBar(
+                          content: Text(statusMessage),
+                          backgroundColor: success ? Colors.green : Colors.red,
+                        );
 
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       },

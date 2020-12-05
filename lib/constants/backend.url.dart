@@ -1,0 +1,1 @@
+const String baseUrl = "https://projekt-friday-backend.herokuapp.com";
