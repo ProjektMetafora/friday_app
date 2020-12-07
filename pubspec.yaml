@@ -24,6 +24,10 @@ dependencies:
   flutter_riverpod: ^0.12.1
   image_picker: ^0.6.7+14
 
+  credit_card_slider: ^1.0.1
+
+  google_fonts: ^1.1.1
+
   country_list_pick: ^1.0.1+2
 
   cupertino_icons: ^1.0.0
@@ -37,6 +41,7 @@ flutter:
     - assets/icons/
     - assets/fonts/
     - assets/images/
+    - assets/images/kyc/
     - assets/images/shopping/
 
   fonts:

@@ -9,6 +9,7 @@ import 'package:friday_app/contrauikit/login/contra_text.dart';
 import 'package:friday_app/contrauikit/utils/colors.dart';
 import 'package:friday_app/screens/kyc_verification/kyc_screen.dart';
 import 'package:friday_app/screens/register/register_screen.dart';
+import 'package:friday_app/ui/friday_text_form_field.dart';
 import 'package:requests/requests.dart';
 
 import 'login_input_email.dart';
@@ -26,154 +27,171 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          Container(
-            color: white,
-            padding: EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Container(),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Center(
-                    child: ContraText(
-                      text: 'Friday',
-                      alignment: Alignment.center,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FlutterLogo(
-                        size: 200,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 24,
-                ),
-                Expanded(
-                  flex: 7,
+      // resizeToAvoidBottomInset: false,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: Stack(
+              children: [
+                Container(
+                  height: constraints.maxHeight+200,
+                  width: constraints.maxWidth,
+                  color: white,
+                  padding: EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     children: <Widget>[
-                      ContraText(
-                        text: "Login",
-                        alignment: Alignment.centerLeft,
+                      Expanded(
+                        flex: 1,
+                        child: Container(),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Center(
+                          child: ContraText(
+                            text: 'Friday',
+                            alignment: Alignment.center,
+                            size: 55,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            FlutterLogo(
+                              size: 200,
+                            ),
+                          ],
+                        ),
                       ),
                       SizedBox(
                         height: 24,
                       ),
-                      LoginEmailText(
-                        controller: emailController,
-                        text: "Email address",
-                        iconPath: "assets/icons/user.svg",
-                      ),
-                      SizedBox(
-                        height: 24,
-                      ),
-                      LoginPasswordText(
-                        controller: passwordController,
-                        text: "..........",
-                        iconPath: "assets/icons/lock.svg",
-                      ),
-                      SizedBox(
-                        height: 48,
-                      ),
-                      ButtonPlainWithIcon(
-                        color: wood_smoke,
-                        textColor: white,
-                        iconPath: "assets/icons/arrow_next.svg",
-                        isPrefix: false,
-                        isSuffix: true,
-                        text: "Sign in",
-                        callback: () async {
-                          print(
-                              'email: ${emailController.text}, password: ${passwordController.text}');
-                          String encoded = base64.encode(utf8.encode(
-                              "${emailController.text}:${passwordController.text}"));
-                          print('encoded: $encoded');
-
-                          String statusString = "LOGIN SUCCESS";
-                          bool success = false;
-
-                          try {
-                            var r = await Requests.get(
-                              '$baseUrl/login/$encoded',
-                              bodyEncoding: RequestBodyEncoding.JSON,
-                            );
-                            r.raiseForStatus();
-                            String body = r.content();
-                            print(body);
-
-                            success = true;
-
-                            // login success, go to KYC screen
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => KycScreen(),
+                      Form(
+                        child: Expanded(
+                          flex: 7,
+                          child: Column(
+                            children: <Widget>[
+                              ContraText(
+                                text: "Login",
+                                alignment: Alignment.centerLeft,
                               ),
-                            );
-                          } on HTTPException catch (err) {
-                            statusString = err.message;
-                            statusString = err.response.json()['detail'];
-                            print(err.message);
-                          } catch (err) {
-                            statusString = err.toString();
-                            print(err);
-                          }
-
-                          final snackBar = SnackBar(
-                            content: Text(statusString),
-                            backgroundColor:
-                                success ? Colors.green : Colors.red,
-                          );
-
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        },
-                      ),
-                      SizedBox(
-                        height: 36,
-                      ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: RichText(
-                          text: TextSpan(
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: "You are new? ",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13,
-                                  color: black,
-                                ),
+                              SizedBox(
+                                height: 24,
                               ),
-                              TextSpan(
-                                text: "Create new",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: flamingo,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
+                              FridayTextFormField(
+                                obscureText: false,
+                                labelText: 'Email',
+                                controller: emailController,
+                                text: "Email address",
+                                iconPath: "assets/icons/user.svg",
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+                              SizedBox(
+                                height: 24,
+                              ),
+                              FridayTextFormField(
+                                labelText: 'Password',
+                                controller: passwordController,
+                                text: "..........",
+                                keyboardType: TextInputType.text,
+                                iconPath: "assets/icons/lock.svg",
+                                obscureText: true,
+                              ),
+                              SizedBox(
+                                height: 48,
+                              ),
+                              ButtonPlainWithIcon(
+                                color: wood_smoke,
+                                textColor: white,
+                                iconPath: "assets/icons/arrow_next.svg",
+                                isPrefix: false,
+                                isSuffix: true,
+                                text: "Sign in",
+                                callback: () async {
+                                  print(
+                                      'email: ${emailController.text}, password: ${passwordController.text}');
+                                  String encoded = base64.encode(utf8.encode(
+                                      "${emailController.text}:${passwordController.text}"));
+                                  print('encoded: $encoded');
+
+                                  String statusString = "LOGIN SUCCESS";
+                                  bool success = false;
+
+                                  try {
+                                    // var r = await Requests.get(
+                                    //   '$baseUrl/login/$encoded',
+                                    //   bodyEncoding: RequestBodyEncoding.JSON,
+                                    // );
+                                    // r.raiseForStatus();
+                                    // String body = r.content();
+                                    // print(body);
+
+                                    success = true;
+
+                                    // login success, go to KYC screen
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => RegisterScreen(),
+                                        builder: (context) => KycScreen(),
                                       ),
                                     );
-                                  },
-                              )
+                                  } on HTTPException catch (err) {
+                                    statusString = err.message;
+                                    statusString = err.response.json()['detail'];
+                                    print(err.message);
+                                  } catch (err) {
+                                    statusString = err.toString();
+                                    print(err);
+                                  }
+
+                                  final snackBar = SnackBar(
+                                    content: Text(statusString),
+                                    backgroundColor:
+                                    success ? Colors.green : Colors.red,
+                                  );
+                                  if (!success)
+                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                },
+                              ),
+                              SizedBox(
+                                height: 36,
+                              ),
+                              Align(
+                                alignment: Alignment.center,
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: "You are new? ",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 13,
+                                          color: black,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: "Create new",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: flamingo,
+                                        ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => RegisterScreen(),
+                                              ),
+                                            );
+                                          },
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -183,22 +201,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
-          ),
-          // Positioned(
-          //   left: 24,
-          //   top: 80,
-          //   child: ButtonRoundWithShadow(
-          //     size: 48,
-          //     iconPath: "assets/icons/close.svg",
-          //     borderColor: black,
-          //     shadowColor: black,
-          //     color: white,
-          //     callback: () {
-          //       // Navigator.of(context).pop();
-          //     },
-          //   ),
-          // )
-        ],
+          );
+        },
       ),
     );
   }

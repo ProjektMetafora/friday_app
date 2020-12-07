@@ -3,12 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/all.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:friday_app/contrauikit/custom_widgets/button_round_with_shadow.dart';
 import 'package:friday_app/contrauikit/custom_widgets/button_solid_with_icon.dart';
 import 'package:friday_app/contrauikit/custom_widgets/contra_button.dart';
-import 'package:friday_app/contrauikit/custom_widgets/contra_input_box.dart';
 import 'package:friday_app/contrauikit/login/contra_text.dart';
 import 'package:friday_app/contrauikit/utils/colors.dart';
+import 'package:friday_app/screens/home/home_screen.dart';
+import 'package:friday_app/ui/close_button.dart';
+import 'package:friday_app/ui/friday_text_form_field.dart';
 import 'package:image_picker/image_picker.dart';
 
 class KycScreen extends StatefulWidget {
@@ -26,30 +27,42 @@ class _KycScreenState extends State<KycScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Consumer(
-            builder: (context, watch, _) {
-              final step = watch(currStepProvider).state;
-              return stepScreens[step];
-            },
-          ),
-          Positioned(
-            left: 24,
-            top: 80,
-            child: ButtonRoundWithShadow(
-              size: 48,
-              iconPath: "assets/icons/close.svg",
-              borderColor: black,
-              shadowColor: black,
-              color: white,
-              callback: () {
-                context.read(currStepProvider).state = 0;
-                Navigator.of(context).pop();
-              },
-            ),
-          )
-        ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Stack(
+            children: [
+              Consumer(
+                builder: (context, watch, _) {
+                  final step = watch(currStepProvider).state;
+                  return stepScreens[step];
+                },
+              ),
+              Positioned(
+                // left: 24,
+                top: 60,
+                child: Container(
+                  color: Colors.white70,
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  height: 60,
+                  width: constraints.maxWidth,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      FridayCloseButton(
+                        onPressed: () {
+                          context.read(currStepProvider).state = 0;
+                          Navigator.maybePop(context);
+                        },
+                        iconSize: 40.0,
+                        color: Colors.red,
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          );
+        },
       ),
     );
   }
@@ -83,46 +96,58 @@ class _KYCFormState extends State<KYCForm> {
               SizedBox(
                 height: 24,
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ContraInputBox(
-                  hintText: "Full Name",
-                  showPrefix: false,
+              Form(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: FridayTextFormField(
+                        labelText: 'Name',
+                        text: "Full Name",
+                        keyboardType: TextInputType.name,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: FridayTextFormField(
+                        labelText: 'PAN/Aadhar Card',
+                        text: "XXXX-XXXX-XXXX",
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ButtonPlainWithIcon(
+                        color: wood_smoke,
+                        textColor: white,
+                        iconPath: "assets/icons/arrow_next.svg",
+                        isPrefix: false,
+                        isSuffix: true,
+                        text: "Image Proof",
+                        callback: () async {
+                          try {
+                            final pickedFile = await _picker.getImage(
+                              source: ImageSource.gallery,
+                            );
+                            setState(() {
+                              _imageFile = pickedFile;
+                              imagePreview = Image.file(File(pickedFile.path));
+                            });
+                          } catch (e) {}
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ContraInputBox(
-                  hintText: "PAN/Aadhar Card",
-                  showPrefix: false,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ButtonPlainWithIcon(
-                  color: wood_smoke,
-                  textColor: white,
-                  iconPath: "assets/icons/arrow_next.svg",
-                  isPrefix: false,
-                  isSuffix: true,
-                  text: "Image Proof",
-                  callback: () async {
-                    try {
-                      final pickedFile = await _picker.getImage(
-                        source: ImageSource.gallery,
-                      );
-                      setState(() {
-                        _imageFile = pickedFile;
-                        imagePreview = Image.file(File(pickedFile.path));
-                      });
-                    } catch (e) {}
-                  },
-                ),
-              ),
-              Container(
-                height: 200.0,
-                child: imagePreview,
-              ),
+              imagePreview != null
+                  ? Container(
+                      height: 200.0,
+                      child: imagePreview,
+                    )
+                  : Container(
+                      height: 8,
+                    ),
               SizedBox(
                 height: 24,
               ),
@@ -133,12 +158,19 @@ class _KYCFormState extends State<KYCForm> {
                   text: "Confirm",
                   color: persian_blue,
                   textColor: white,
-                  callback: () {},
+                  callback: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomeScreen(),
+                      ),
+                    );
+                  },
                   height: 50,
-                  isPrefix: true,
+                  isPrefix: false,
                   shadowColor: persian_blue,
-                  isSuffix: false,
-                  iconPath: "assets/icons/ic_heart_fill.svg",
+                  isSuffix: true,
+                  iconPath: "assets/icons/arrow_next.svg",
                   iconColor: white,
                 ),
               ),
@@ -167,10 +199,13 @@ class KYCOnboardingScreen extends StatelessWidget {
                     height: 40,
                   ),
                   Center(
-                    child: SvgPicture.asset(
-                      "assets/images/onboarding_image_four.svg",
-                      height: 340,
-                      width: 310,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: SvgPicture.asset(
+                        "assets/images/kyc/undraw_certification_aif8.svg",
+                        height: 340,
+                        width: 310,
+                      ),
                     ),
                   ),
                 ],
