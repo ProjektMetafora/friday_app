@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_signin_button/button_builder.dart';
+import 'package:flutter_signin_button/button_list.dart';
+import 'package:flutter_signin_button/button_view.dart';
 import 'package:friday_app/constants/backend.url.dart';
 import 'package:friday_app/contrauikit/custom_widgets/button_solid_with_icon.dart';
 import 'package:friday_app/contrauikit/login/contra_text.dart';
@@ -10,6 +13,7 @@ import 'package:friday_app/contrauikit/utils/colors.dart';
 import 'package:friday_app/screens/kyc_verification/kyc_screen.dart';
 import 'package:friday_app/screens/register/register_screen.dart';
 import 'package:friday_app/ui/friday_text_form_field.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:requests/requests.dart';
 
 import 'login_input_email.dart';
@@ -23,6 +27,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+
+  GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: [
+      'email',
+      'profile',
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Form(
                         child: Expanded(
-                          flex: 7,
+                          flex: 9,
                           child: Column(
                             children: <Widget>[
                               ContraText(
@@ -154,6 +165,30 @@ class _LoginScreenState extends State<LoginScreen> {
                                   if (!success)
                                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                 },
+                              ),
+                              SizedBox(
+                                height: 24,
+                              ),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Container(
+                                  width: constraints.maxWidth,
+                                  height: 48,
+                                  child: SignInButton(
+                                    Buttons.GoogleDark,
+                                    elevation: 8.0,
+                                    text: "Sign in with Google",
+                                    onPressed: () async {
+                                      try {
+                                        await _googleSignIn.signIn();
+                                        print(_googleSignIn.currentUser);
+                                      } catch (error) {
+                                        print(error);
+                                      }
+                                    },
+                                    padding: EdgeInsets.all(0),
+                                  ),
+                                ),
                               ),
                               SizedBox(
                                 height: 36,

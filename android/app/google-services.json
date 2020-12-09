@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "744749463428",
+    "project_id": "projektfriday-7fde1",
+    "storage_bucket": "projektfriday-7fde1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744749463428:android:1a4b0753502c3281468fd1",
+        "android_client_info": {
+          "package_name": "ai.friday.flutter_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "744749463428-ilc5jq3nlvkch0g1m1gtk3dicet6irvb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ai.friday.flutter_app",
+            "certificate_hash": "dd4d862a1395a09e554d43b73a250709c1db1be6"
+          }
+        },
+        {
+          "client_id": "744749463428-1banp6mvm07ukcjeocmusvi7n1hahb6h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgEABqAD4llw0WoNIQp5tzJTxJLd8xYf8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "744749463428-1banp6mvm07ukcjeocmusvi7n1hahb6h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

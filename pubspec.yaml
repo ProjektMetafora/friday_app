@@ -26,6 +26,13 @@ dependencies:
 
   credit_card_slider: ^1.0.1
 
+  google_sign_in: ^4.5.6
+  flutter_signin_button: ^1.1.0
+
+  # firebase
+  firebase_core: ^0.5.3
+  firebase_auth: ^0.18.4+1
+
   google_fonts: ^1.1.1
 
   country_list_pick: ^1.0.1+2
