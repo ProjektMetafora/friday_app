@@ -5,6 +5,7 @@ import 'package:credit_card_slider/credit_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:friday_app/contrauikit/login/contra_text.dart';
 import 'package:friday_app/contrauikit/utils/colors.dart';
+import 'package:friday_app/ui/navigation_drawer/collapsible_navigation_drawer.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -17,6 +18,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 SafeArea(
                   child: Container(
+                    margin: EdgeInsets.only(left: 70),
                     height: constraints.maxHeight,
                     width: constraints.maxWidth,
                     color: white,
@@ -37,7 +39,8 @@ class HomeScreen extends StatelessWidget {
                         ),
                         FittedBox(
                           child: CreditCard(
-                            cardBackground: SolidColorCardBackground(Colors.black.withOpacity(0.6)),
+                            cardBackground: SolidColorCardBackground(
+                                Colors.black.withOpacity(0.6)),
                             cardNetworkType: CardNetworkType.visaBasic,
                             cardHolderName: 'The boring developer',
                             cardNumber: '1234 **** **** ****',
@@ -85,6 +88,12 @@ class HomeScreen extends StatelessWidget {
                         )
                       ],
                     ),
+                  ),
+                ),
+                SafeArea(
+                  child: Container(
+                    height: constraints.maxHeight,
+                    child: CollapsibleNavigationDrawer(),
                   ),
                 ),
               ],

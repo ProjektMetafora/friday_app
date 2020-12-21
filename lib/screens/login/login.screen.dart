@@ -1,23 +1,16 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_signin_button/button_builder.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
-import 'package:friday_app/constants/backend.url.dart';
 import 'package:friday_app/contrauikit/custom_widgets/button_solid_with_icon.dart';
 import 'package:friday_app/contrauikit/login/contra_text.dart';
 import 'package:friday_app/contrauikit/utils/colors.dart';
 import 'package:friday_app/screens/kyc_verification/kyc_screen.dart';
 import 'package:friday_app/screens/register/register_screen.dart';
+import 'package:friday_app/services/login.service.dart';
 import 'package:friday_app/ui/friday_text_form_field.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:requests/requests.dart';
-
-import 'login_input_email.dart';
-import 'login_input_password.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -36,6 +29,16 @@ class _LoginScreenState extends State<LoginScreen> {
   );
 
   @override
+  void initState() {
+    super.initState();
+
+    // for debugging, just logout the user if they are signed in
+    if (_googleSignIn.currentUser != null) {
+      _googleSignIn.signOut();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       // resizeToAvoidBottomInset: false,
@@ -45,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Stack(
               children: [
                 Container(
-                  height: constraints.maxHeight+200,
+                  height: constraints.maxHeight + 200,
                   width: constraints.maxWidth,
                   color: white,
                   padding: EdgeInsets.symmetric(horizontal: 24),
@@ -121,24 +124,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                 isSuffix: true,
                                 text: "Sign in",
                                 callback: () async {
-                                  print(
-                                      'email: ${emailController.text}, password: ${passwordController.text}');
-                                  String encoded = base64.encode(utf8.encode(
-                                      "${emailController.text}:${passwordController.text}"));
-                                  print('encoded: $encoded');
-
                                   String statusString = "LOGIN SUCCESS";
                                   bool success = false;
 
-                                  try {
-                                    // var r = await Requests.get(
-                                    //   '$baseUrl/login/$encoded',
-                                    //   bodyEncoding: RequestBodyEncoding.JSON,
-                                    // );
-                                    // r.raiseForStatus();
-                                    // String body = r.content();
-                                    // print(body);
+                                  LoginService.instance.loginUser(
+                                      emailController.text,
+                                      passwordController.text);
 
+                                  if (LoginService.instance.currentUser !=
+                                      null) {
                                     success = true;
 
                                     // login success, go to KYC screen
@@ -148,22 +142,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                         builder: (context) => KycScreen(),
                                       ),
                                     );
-                                  } on HTTPException catch (err) {
-                                    statusString = err.message;
-                                    statusString = err.response.json()['detail'];
-                                    print(err.message);
-                                  } catch (err) {
-                                    statusString = err.toString();
-                                    print(err);
                                   }
 
                                   final snackBar = SnackBar(
                                     content: Text(statusString),
                                     backgroundColor:
-                                    success ? Colors.green : Colors.red,
+                                        success ? Colors.green : Colors.red,
                                   );
                                   if (!success)
-                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(snackBar);
                                 },
                               ),
                               SizedBox(
@@ -218,7 +206,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => RegisterScreen(),
+                                                builder: (context) =>
+                                                    RegisterScreen(),
                                               ),
                                             );
                                           },

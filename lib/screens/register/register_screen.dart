@@ -1,19 +1,13 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:friday_app/constants/backend.url.dart';
-import 'package:friday_app/contrauikit/custom_widgets/button_plain_with_shadow.dart';
-import 'package:friday_app/contrauikit/custom_widgets/button_round_with_shadow.dart';
 import 'package:friday_app/contrauikit/custom_widgets/button_solid_with_icon.dart';
 import 'package:friday_app/contrauikit/login/contra_text.dart';
 import 'package:friday_app/contrauikit/utils/colors.dart';
+import 'package:friday_app/models/user_model.dart';
+import 'package:friday_app/services/login.service.dart';
 import 'package:friday_app/ui/close_button.dart';
 import 'package:friday_app/ui/friday_text_form_field.dart';
-import 'package:requests/requests.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -98,7 +92,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         backgroundColor: Colors.blue,
                                         title: Text('Select Your Country'),
                                       ),
-                                      pickerBuilder: (context, CountryCode countryCode) {
+                                      pickerBuilder:
+                                          (context, CountryCode countryCode) {
                                         return Row(
                                           children: [
                                             Container(
@@ -133,8 +128,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
                                   Expanded(
                                     flex: 5,
-                                    child:
-                                    FridayTextFormField(
+                                    child: FridayTextFormField(
                                       labelText: 'Phone',
                                       controller: phoneNumberController,
                                       text: "Phone Number",
@@ -150,7 +144,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               FridayTextFormField(
                                 labelText: 'Password',
                                 controller: passwordController,
-                                text: "\u25CF \u25CF \u25CF \u25CF \u25CF \u25CF",
+                                text:
+                                    "\u25CF \u25CF \u25CF \u25CF \u25CF \u25CF",
                                 keyboardType: TextInputType.text,
                                 iconPath: "assets/icons/lock.svg",
                                 obscureText: true,
@@ -166,60 +161,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 isSuffix: true,
                                 text: "Sign up",
                                 callback: () async {
-                                  String encoded = base64.encode(utf8.encode(
-                                      "${emailController.text}:${passwordController.text}|${Random.secure().nextInt(1000000)}"));
-
-                                  print('encoded: $encoded');
-
                                   // split the name into first and last name
                                   List<String> splitName =
-                                  fullNameController.text.split(" ");
+                                      fullNameController.text.split(" ");
                                   String firstName = splitName[0].trim();
-                                  String lastName = splitName.sublist(1).join(" ").trim();
+                                  String lastName =
+                                      splitName.sublist(1).join(" ").trim();
 
                                   String statusMessage = "REGISTER SUCCESS";
 
                                   bool success = false;
 
-                                  try {
-                                    Map<String, dynamic> body = {
-                                      "firstname": firstName,
-                                      "lastname": lastName,
-                                      "email": "${emailController.text}",
-                                      "country_code": countryCode,
-                                      "mob": phoneNumberController.text,
-                                    };
+                                  FridayRegisterUser user = FridayRegisterUser(
+                                      email: emailController.text,
+                                      password: passwordController.text,
+                                      firstName: firstName,
+                                      lastName: lastName,
+                                      countryCode: countryCode,
+                                      mob: phoneNumberController.text);
 
-                                    print(body);
+                                  LoginService.instance.registerUser(user);
 
-                                    // var r = await Requests.post(
-                                    //   '$baseUrl/register/$encoded',
-                                    //   body: body,
-                                    //   bodyEncoding: RequestBodyEncoding.JSON,
-                                    // );
-                                    // r.raiseForStatus();
-                                    // String response = r.content();
-                                    // print(response);
-
+                                  if (LoginService.instance.currentUser !=
+                                      null) {
                                     success = true;
-
                                     // register success
                                     Navigator.of(context).pop();
-                                  } on HTTPException catch (err) {
-                                    statusMessage = err.message;
-                                    statusMessage = err.response.json()['detail'];
-                                    print(err.message);
-                                  } catch (err) {
-                                    statusMessage = err.toString();
-                                    print(err);
                                   }
 
                                   final snackBar = SnackBar(
                                     content: Text(statusMessage),
-                                    backgroundColor: success ? Colors.green : Colors.red,
+                                    backgroundColor:
+                                        success ? Colors.green : Colors.red,
                                   );
 
-                                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar);
                                 },
                               ),
                               SizedBox(
